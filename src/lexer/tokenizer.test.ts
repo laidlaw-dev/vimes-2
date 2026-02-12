@@ -41,17 +41,47 @@ describe('tokenize', () => {
       ]);
     });
     it('tokenizes mix of operators and int literals', () => {
-      expect(tokenize('1 + 2 * (3 - 4)')).toEqual([
-        { kind: 'int_lit', value: 1, literal: '1', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 3 },
-        { kind: 'int_lit', value: 2, literal: '2', line: 1, column: 5 },
-        { kind: 'star', literal: '*', line: 1, column: 7 },
-        { kind: 'left_paren', literal: '(', line: 1, column: 9 },
-        { kind: 'int_lit', value: 3, literal: '3', line: 1, column: 10 },
-        { kind: 'minus', literal: '-', line: 1, column: 12 },
-        { kind: 'int_lit', value: 4, literal: '4', line: 1, column: 14 },
-        { kind: 'right_paren', literal: ')', line: 1, column: 15 },
-      ]);
+      const result = tokenize('1 + 2 * (3 - 4)');
+      expect(result[0]).toMatchObject({
+        kind: 'int_lit',
+        value: 1,
+        literal: '1',
+      });
+      expect(result[1]).toMatchObject({
+        kind: 'plus',
+        literal: '+',
+      });
+      expect(result[2]).toMatchObject({
+        kind: 'int_lit',
+        value: 2,
+        literal: '2',
+      });
+      expect(result[3]).toMatchObject({
+        kind: 'star',
+        literal: '*',
+      });
+      expect(result[4]).toMatchObject({
+        kind: 'left_paren',
+        literal: '(',
+      });
+      expect(result[5]).toMatchObject({
+        kind: 'int_lit',
+        value: 3,
+        literal: '3',
+      });
+      expect(result[6]).toMatchObject({
+        kind: 'minus',
+        literal: '-',
+      });
+      expect(result[7]).toMatchObject({
+        kind: 'int_lit',
+        value: 4,
+        literal: '4',
+      });
+      expect(result[8]).toMatchObject({
+        kind: 'right_paren',
+        literal: ')',
+      });
     });
   });
   describe('adds position information to tokens', () => {

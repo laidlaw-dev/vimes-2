@@ -4,14 +4,13 @@ export type TokenSource = {
   literal: string;
 };
 
-export type TokenKind =
-  | { kind: 'int_lit'; value: number }
-  | { kind: 'plus' }
-  | { kind: 'minus' }
-  | { kind: 'star' }
-  | { kind: 'slash' }
-  | { kind: 'percent' }
-  | { kind: 'left_paren' }
-  | { kind: 'right_paren' };
-
-export type Token = TokenKind & TokenSource;
+export type Token =
+  | ({ kind: 'int_lit'; value: number } & TokenSource)
+  | ({ kind: 'plus' } & TokenSource)
+  | ({ kind: 'minus' } & TokenSource)
+  | ({ kind: 'star' } & TokenSource)
+  | ({ kind: 'slash' } & TokenSource)
+  | ({ kind: 'percent' } & TokenSource)
+  | ({ kind: 'left_paren' } & TokenSource)
+  | ({ kind: 'right_paren' } & TokenSource)
+  | { kind: 'eof'; literal: '' };
