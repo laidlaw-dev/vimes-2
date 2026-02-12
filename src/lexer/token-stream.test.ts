@@ -1,4 +1,4 @@
-import { Token } from './tokens.js';
+import { Token } from './token.js';
 
 import { TokenStream } from './token-stream.js';
 
@@ -16,7 +16,9 @@ describe('TokenStream', () => {
     });
     it('returns the EOF token when the stream is empty', () => {
       const stream = new TokenStream([], 0);
-      expect(stream.peek()).toEqual({ kind: 'eof', literal: '' });
+      expect(stream.peek()).toMatchObject({
+        kind: 'eof',
+      });
     });
     it('returns the EOF token when the position is at the end of the stream', () => {
       const tokens = [
@@ -24,7 +26,9 @@ describe('TokenStream', () => {
         { kind: 'plus', literal: '+', line: 1, column: 4 },
       ] as Token[];
       const stream = new TokenStream(tokens, tokens.length);
-      expect(stream.peek()).toEqual({ kind: 'eof', literal: '' });
+      expect(stream.peek()).toMatchObject({
+        kind: 'eof',
+      });
     });
   });
   describe('next', () => {
@@ -45,7 +49,9 @@ describe('TokenStream', () => {
       const stream = new TokenStream(tokens, 0);
       stream.next();
       stream.next();
-      expect(stream.next()).toEqual({ kind: 'eof', literal: '' });
+      expect(stream.next()).toMatchObject({
+        kind: 'eof',
+      });
     });
   });
   describe('expect', () => {

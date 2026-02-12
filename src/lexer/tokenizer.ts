@@ -1,4 +1,4 @@
-import { Token, TokenSource } from './tokens.js';
+import { PositionalToken, Token, TokenSource } from './token.js';
 
 export const tokenize = (input: string): Token[] => {
   if (input.length === 0) {
@@ -62,7 +62,7 @@ class Tokenizer {
     );
   }
 
-  private readNumber(): Token | undefined {
+  private readNumber(): PositionalToken | undefined {
     if (!this.isDigit(this.input[this.position])) {
       return;
     }
@@ -82,7 +82,7 @@ class Tokenizer {
     };
   }
 
-  private readOperator(char: string): Token | undefined {
+  private readOperator(char: string): PositionalToken | undefined {
     if (char === '+') {
       return {
         kind: 'plus',
@@ -127,7 +127,7 @@ class Tokenizer {
     }
   }
 
-  private tokenComplete(token: Token) {
+  private tokenComplete(token: PositionalToken) {
     this.position += token.literal.length;
     return token;
   }

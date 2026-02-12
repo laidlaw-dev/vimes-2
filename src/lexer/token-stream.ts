@@ -1,4 +1,4 @@
-import { Token } from './tokens.js';
+import { Token } from './token.js';
 
 export class TokenStream {
   constructor(
@@ -7,7 +7,14 @@ export class TokenStream {
   ) {}
 
   peek(): Token {
-    return this.tokens[this.position] ?? { kind: 'eof', literal: '' };
+    return (
+      this.tokens[this.position] ?? {
+        kind: 'eof',
+        literal: '',
+        line: -1,
+        column: -1,
+      }
+    );
   }
 
   next(): Token {
