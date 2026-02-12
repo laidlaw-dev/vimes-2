@@ -12,6 +12,7 @@ export type TokenKind =
   | { kind: 'slash' }
   | { kind: 'percent' }
   | { kind: 'left_paren' }
-  | { kind: 'right_paren' };
+  | { kind: 'right_paren' }
+  | { kind: 'eof' };
 
 export type Token = TokenKind & TokenSource;

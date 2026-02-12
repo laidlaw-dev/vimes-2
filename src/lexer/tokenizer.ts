@@ -1,18 +1,12 @@
 import { Token, TokenSource } from './tokens.js';
 
 export const tokenize = (input: string): Token[] => {
-  if (input.length === 0) {
-    return [];
-  }
-
   const tokens: Token[] = [];
   const tokenizer = new Tokenizer(input);
-  while (!tokenizer.isEndOfInput()) {
+  do {
     const token = tokenizer.nextToken();
-    if (token) {
-      tokens.push(token);
-    }
-  }
+    tokens.push(token);
+  } while (tokens[tokens.length - 1].kind !== 'eof');
   return tokens;
 };
 
@@ -32,12 +26,12 @@ class Tokenizer {
     return this.position >= this.inputLength;
   }
 
-  nextToken(): Token | undefined {
+  nextToken(): Token {
     const char = this.moveToNextToken();
 
     // Handle end of input after skipping whitespace
     if (this.isEndOfInput()) {
-      return;
+      return { kind: 'eof', ...this.getTokenSource(this.position, '') };
     }
 
     // Try to read a number token first
