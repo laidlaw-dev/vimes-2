@@ -1,4 +1,4 @@
-import { replStep } from './repl-core.js';
+import { replStep } from '@/repl/repl-core.js';
 
 describe('replStep', () => {
   it('evalulates a simple expression', () => {

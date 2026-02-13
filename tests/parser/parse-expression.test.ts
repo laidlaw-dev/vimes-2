@@ -1,5 +1,5 @@
-import { TokenStream, Token } from '../lexer/index.js';
-import { parseExpression } from './parse-expression.js';
+import { TokenStream, Token } from '../../src/lexer/index.js';
+import { parseExpression } from '../../src/parser/parse-expression.js';
 
 describe('parseExpression', () => {
   it('parses integer literals', () => {

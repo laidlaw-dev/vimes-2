@@ -1,4 +1,4 @@
-import { tokenize } from './tokenizer.js';
+import { tokenize } from '../../src/lexer/tokenizer.js';
 
 describe('tokenize', () => {
   describe('ints', () => {

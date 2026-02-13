@@ -1,4 +1,4 @@
-import { evaluate } from './evaluate.js';
+import { evaluate } from '@/runtime/index.js';
 
 describe('evaluate', () => {
   it('evaluates integer literals', () => {

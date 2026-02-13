@@ -1,6 +1,4 @@
-import { Token } from './token.js';
-
-import { TokenStream } from './token-stream.js';
+import { Token, TokenStream } from '@/lexer/index.js';
 
 describe('TokenStream', () => {
   describe('peek', () => {

@@ -24,3 +24,8 @@ src/
   parser/
   runtime/
   repl/
+tests/
+  lexer/
+  parser/
+  runtime/
+  repl/

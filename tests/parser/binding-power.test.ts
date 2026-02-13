@@ -1,5 +1,5 @@
-import { Token } from 'src/lexer/index.js';
-import { getBindingPower } from './binding-power.js';
+import { Token } from '@/lexer/index.js';
+import { getBindingPower } from '@/parser/binding-power.js';
 
 describe('getBindingPower', () => {
   it('returns correct binding power for multiply, divide and modulo', () => {

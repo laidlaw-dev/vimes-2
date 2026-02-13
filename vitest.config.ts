@@ -4,6 +4,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    exclude: ['node_modules', 'dist'],
+    include: ['tests/**/*.ts'],
+    typecheck: {
+      tsconfig: './tests/tsconfig.json',
+    },
+  },
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
   },
 });
