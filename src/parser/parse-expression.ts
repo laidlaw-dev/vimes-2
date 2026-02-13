@@ -1,6 +1,6 @@
 import { Token, TokenStream } from '../lexer/index.js';
 import { getBindingPower } from './binding-power.js';
-import { Expression } from './expression.js';
+import { ASTExpression } from './ast-expression.js';
 
 export const parseExpression = (
   stream: TokenStream,
@@ -17,7 +17,7 @@ export const parseExpression = (
   return left;
 };
 
-const nud = (token: Token, stream: TokenStream): Expression => {
+const nud = (token: Token, stream: TokenStream): ASTExpression => {
   switch (token.kind) {
     case 'int_lit':
       return { kind: 'int_lit', value: token.value as number };
@@ -42,10 +42,10 @@ const nud = (token: Token, stream: TokenStream): Expression => {
 };
 
 const led = (
-  left: Expression,
+  left: ASTExpression,
   token: Token,
   stream: TokenStream
-): Expression => {
+): ASTExpression => {
   switch (token.kind) {
     case 'plus': {
       const right = parseExpression(stream, getBindingPower(token));

@@ -20,5 +20,7 @@ This is a node js project
 
 src/
   index.ts (entry point)
-  lexer/ (tokenizer)
+  lexer/
   parser/
+  runtime/
+  repl/

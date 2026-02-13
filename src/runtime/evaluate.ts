@@ -1,6 +1,6 @@
-import { Expression } from '../parser/expression.js';
+import { ASTExpression } from '../parser/ast-expression.js';
 
-export const evaluate = (expr: Expression): number => {
+export const evaluate = (expr: ASTExpression): number => {
   switch (expr.kind) {
     case 'int_lit':
       return expr.value;
