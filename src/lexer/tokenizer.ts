@@ -1,19 +1,28 @@
-import { PositionalToken, Token, TokenSource } from './token.js';
+import {
+  error,
+  Errors,
+  isError,
+  ok,
+  Result,
+  TokenSource,
+} from '@/errors/index.js';
+import { PositionalToken, Token } from './token.js';
 
-export const tokenize = (input: string): Token[] => {
+export const tokenize = (input: string): Result<Token[]> => {
   if (input.length === 0) {
-    return [];
+    return ok([]);
   }
 
   const tokens: Token[] = [];
   const tokenizer = new Tokenizer(input);
   while (!tokenizer.isEndOfInput()) {
-    const token = tokenizer.nextToken();
-    if (token) {
-      tokens.push(token);
+    const result = tokenizer.nextToken();
+    if (isError(result)) {
+      return error(result.error);
     }
+    if (result.kind !== 'eof') tokens.push(result);
   }
-  return tokens;
+  return ok(tokens);
 };
 
 class Tokenizer {
@@ -32,12 +41,12 @@ class Tokenizer {
     return this.position >= this.inputLength;
   }
 
-  nextToken(): Token | undefined {
+  nextToken(): Result<Token> {
     const char = this.moveToNextToken();
 
     // Handle end of input after skipping whitespace
     if (this.isEndOfInput()) {
-      return;
+      return ok({ kind: 'eof' });
     }
 
     // Try to read a number token first
@@ -53,18 +62,20 @@ class Tokenizer {
     }
 
     // If we get here, it's an unexpected character
-    const startOfLiteral = this.position > 4 ? this.position - 4 : 0;
-    const endOfLiteral = Math.min(this.position + 5, this.inputLength);
-    const literal = this.input.slice(startOfLiteral, endOfLiteral);
+    const literal = char;
 
-    throw new Error(
-      `Unexpected character "${char}" at line ${this.line + 1}, col ${this.position - this.lineStartIndex + 1}: "${literal}"`
+    return error(
+      Errors.unexpectedToken({
+        line: this.line + 1,
+        column: this.position - this.lineStartIndex + 1,
+        literal: literal,
+      })
     );
   }
 
   private readNumber(): PositionalToken | undefined {
     if (!this.isDigit(this.input[this.position])) {
-      return;
+      return undefined;
     }
     let lexeme = '';
     const startPosition = this.position;
@@ -127,9 +138,9 @@ class Tokenizer {
     }
   }
 
-  private tokenComplete(token: PositionalToken) {
+  private tokenComplete(token: PositionalToken): Result<Token> {
     this.position += token.literal.length;
-    return token;
+    return ok(token);
   }
 
   private moveToNextToken() {

@@ -1,4 +1,6 @@
+import { Errors, isError } from '@/errors/index.js';
 import { tokenize } from '../../src/lexer/tokenizer.js';
+import { Token } from '@/lexer/index.js';
 
 describe('tokenize', () => {
   describe('ints', () => {
@@ -41,7 +43,8 @@ describe('tokenize', () => {
       ]);
     });
     it('tokenizes mix of operators and int literals', () => {
-      const result = tokenize('1 + 2 * (3 - 4)');
+      const result = tokenize('1 + 2 * (3 - 4)') as Token[];
+
       expect(result[0]).toMatchObject({
         kind: 'int_lit',
         value: 1,
@@ -132,11 +135,15 @@ describe('tokenize', () => {
     });
   });
   describe('errors', () => {
-    it('throws an error if it encounters an invalid character', () => {
-      // 'Unexpected character "@" at line 2, col 7: "+ 2 @ 3 +"'
-      expect(() => tokenize('2 +3\n1 + 2 @ 3 + 4')).toThrow(
-        'Unexpected character "@" at line 2, col 7: "+ 2 @ 3 +"'
-      );
+    it('returns an error if it encounters an invalid character', () => {
+      const expectedError = Errors.unexpectedToken({
+        line: 2,
+        column: 7,
+        literal: '@',
+      });
+      const result = tokenize('2 +3\n1 + 2 @ 3 + 4');
+      expect(isError(result)).toBe(true);
+      expect(result).toMatchObject({ error: expectedError });
     });
   });
 });

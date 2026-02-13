@@ -1,8 +1,4 @@
-export type TokenSource = {
-  line: number;
-  column: number;
-  literal: string;
-};
+import { TokenSource } from '@/errors/index.js';
 
 export type TokenKind =
   | { kind: 'int_lit'; value: number }
