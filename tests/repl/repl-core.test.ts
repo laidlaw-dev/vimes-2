@@ -7,22 +7,20 @@ describe('replStep', () => {
   });
   it('returns an error message for invalid input token', () => {
     const expectedError = Errors.unexpectedToken({
-      literal: '@',
-      line: 1,
-      column: 1,
+      position: 0,
+      length: 1,
     });
-    expect(replStep('@')).toBe(`Error: ${expectedError.message}`);
+    expect(replStep('@')).toContain(`Error: ${expectedError.message}`);
   });
   it('returns an error message for invalid parsing', () => {
-    const expectedError = Errors.unexpectedEOF();
-    expect(replStep('1 +')).toBe(`Error: ${expectedError.message}`);
+    const expectedError = Errors.unexpectedEOF({ position: 3, length: 0 });
+    expect(replStep('1 +')).toContain(`Error: ${expectedError.message}`);
   });
   it('returns an error message for runtime errors', () => {
     const expectedError = Errors.runtimeDivisionByZero({
-      literal: '0',
-      line: 1,
-      column: 3,
+      position: 4,
+      length: 1,
     });
-    expect(replStep('1 / 0')).toBe(`Error: ${expectedError.message}`);
+    expect(replStep('1 / 0')).toContain(`Error: ${expectedError.message}`);
   });
 });
