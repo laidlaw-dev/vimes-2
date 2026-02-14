@@ -1,4 +1,4 @@
-import { PositionalToken, Token, TokenStream } from '../lexer/index.js';
+import { Token, TokenStream } from '../lexer/index.js';
 import { getBindingPower } from './binding-power.js';
 import { ASTExpression, ASTExpressionCore } from './ast-expression.js';
 import { error, Errors, isError, Result } from '@/errors/index.js';
@@ -54,13 +54,17 @@ const nud = (token: Token, stream: TokenStream): Result<ASTExpression> => {
     }
     default: {
       if (token.kind === 'eof') {
-        return error(Errors.unexpectedEOF());
+        return error(
+          Errors.unexpectedEOF({
+            position: token.position,
+            length: token.length,
+          })
+        );
       }
       return error(
         Errors.unexpectedToken({
-          literal: token.literal,
-          line: token.line,
-          column: token.column,
+          position: token.position,
+          length: token.length,
         })
       );
     }
@@ -72,76 +76,101 @@ const led = (
   token: Token,
   stream: TokenStream
 ): Result<ASTExpression> => {
+  const startPosition = left.position;
   switch (token.kind) {
     case 'plus': {
       const right = parseExpression(stream, getBindingPower(token));
       if (isError(right)) {
         return right;
       }
-      return createNodeWithPosition(token, {
+      const endPosition = right.position + right.length;
+      const length = endPosition - startPosition;
+      return {
         kind: 'infix',
         operator: '+',
         left,
         right,
-      });
+        position: startPosition,
+        length,
+      };
     }
     case 'minus': {
       const right = parseExpression(stream, getBindingPower(token));
       if (isError(right)) {
         return right;
       }
-      return createNodeWithPosition(token, {
+      const endPosition = right.position + right.length;
+      const length = endPosition - left.position;
+      return {
         kind: 'infix',
         operator: '-',
         left,
         right,
-      });
+        position: left.position,
+        length,
+      };
     }
     case 'star': {
       const right = parseExpression(stream, getBindingPower(token));
       if (isError(right)) {
         return right;
       }
-      return createNodeWithPosition(token, {
+      const endPosition = right.position + right.length;
+      const length = endPosition - left.position;
+      return {
         kind: 'infix',
         operator: '*',
         left,
         right,
-      });
+        position: left.position,
+        length,
+      };
     }
     case 'slash': {
       const right = parseExpression(stream, getBindingPower(token));
       if (isError(right)) {
         return right;
       }
-      return createNodeWithPosition(token, {
+      const endPosition = right.position + right.length;
+      const length = endPosition - left.position;
+      return {
         kind: 'infix',
         operator: '/',
         left,
         right,
-      });
+        position: left.position,
+        length,
+      };
     }
     case 'percent': {
       const right = parseExpression(stream, getBindingPower(token));
       if (isError(right)) {
         return right;
       }
-      return createNodeWithPosition(token, {
+      const endPosition = right.position + right.length;
+      const length = endPosition - left.position;
+      return {
         kind: 'infix',
         operator: '%',
         left,
         right,
-      });
+        position: left.position,
+        length,
+      };
     }
     default: {
       if (token.kind === 'eof') {
-        return error(Errors.unexpectedEOF());
+        return error(
+          Errors.unexpectedEOF({
+            position: token.position,
+            length: token.length,
+          })
+        );
       }
       return error(
         Errors.unexpectedToken({
-          literal: token.literal,
-          line: token.line,
-          column: token.column,
+          position: token.position,
+          length: token.length,
         })
       );
     }
@@ -149,13 +178,12 @@ const led = (
 };
 
 const createNodeWithPosition = (
-  token: PositionalToken,
+  token: Token,
   node: ASTExpressionCore
 ): ASTExpression => {
   return {
     ...node,
-    literal: token.literal,
-    line: token.line,
-    column: token.column,
+    position: token.position,
+    length: token.length,
   };
 };

@@ -6,7 +6,7 @@ import {
   Result,
   TokenSource,
 } from '@/errors/index.js';
-import { PositionalToken, Token } from './token.js';
+import { Token } from './token.js';
 
 export const tokenize = (input: string): Result<Token[]> => {
   if (input.length === 0) {
@@ -20,8 +20,11 @@ export const tokenize = (input: string): Result<Token[]> => {
     if (isError(result)) {
       return error(result.error);
     }
-    if (result.kind !== 'eof') tokens.push(result);
+    if (result.kind !== 'eof') {
+      tokens.push(result);
+    }
   }
+
   return ok(tokens);
 };
 
@@ -29,8 +32,6 @@ class Tokenizer {
   private input: string;
   private inputLength: number;
   private position: number = 0;
-  private line: number = 0;
-  private lineStartIndex: number = 0;
 
   constructor(input: string) {
     this.input = input;
@@ -46,7 +47,10 @@ class Tokenizer {
 
     // Handle end of input after skipping whitespace
     if (this.isEndOfInput()) {
-      return ok({ kind: 'eof' });
+      return this.tokenComplete({
+        kind: 'eof',
+        ...this.getTokenSource(this.position),
+      });
     }
 
     // Try to read a number token first
@@ -62,18 +66,15 @@ class Tokenizer {
     }
 
     // If we get here, it's an unexpected character
-    const literal = char;
-
     return error(
       Errors.unexpectedToken({
-        line: this.line + 1,
-        column: this.position - this.lineStartIndex + 1,
-        literal: literal,
+        position: this.position,
+        length: 1,
       })
     );
   }
 
-  private readNumber(): PositionalToken | undefined {
+  private readNumber(): Token | undefined {
     if (!this.isDigit(this.input[this.position])) {
       return undefined;
     }
@@ -93,7 +94,7 @@ class Tokenizer {
     };
   }
 
-  private readOperator(char: string): PositionalToken | undefined {
+  private readOperator(char: string): Token | undefined {
     if (char === '+') {
       return {
         kind: 'plus',
@@ -138,18 +139,14 @@ class Tokenizer {
     }
   }
 
-  private tokenComplete(token: PositionalToken): Result<Token> {
-    this.position += token.literal.length;
+  private tokenComplete(token: Token): Result<Token> {
+    this.position += token.length;
     return ok(token);
   }
 
   private moveToNextToken() {
     let current = this.input[this.position];
     while (this.isWhitespace(current)) {
-      if (this.isNewline(current)) {
-        this.line++;
-        this.lineStartIndex = this.position + 1;
-      }
       this.position++;
       current = this.input[this.position];
     }
@@ -158,12 +155,11 @@ class Tokenizer {
 
   private getTokenSource(
     startingPosition: number,
-    literal: string
+    literal?: string
   ): TokenSource {
     return {
-      literal: literal,
-      line: this.line + 1,
-      column: startingPosition - this.lineStartIndex + 1,
+      position: startingPosition,
+      length: literal ? literal.length : 0,
     };
   }
 

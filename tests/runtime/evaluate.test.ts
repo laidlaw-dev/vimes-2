@@ -68,71 +68,64 @@ describe('evaluate', () => {
   });
   it('returns an error for unknown prefix operators', () => {
     const expectedError = Errors.unexpectedToken({
-      literal: '@',
-      line: 1,
-      column: 1,
+      position: 10,
+      length: 1,
     });
     const result = evaluate({
       kind: 'prefix',
       operator: '@',
       right: { kind: 'int_lit', value: 2 },
-      line: 1,
-      column: 1,
-      literal: '@',
+      position: 10,
+      length: 1,
     } as ASTExpression);
     expect(isError(result)).toBe(true);
     expect(result).toMatchObject({ error: expectedError });
   });
   it('returns an error for unknown infix operators', () => {
     const expectedError = Errors.unexpectedToken({
-      literal: '@',
-      line: 1,
-      column: 5,
+      position: 10,
+      length: 5,
     });
     const result = evaluate({
       kind: 'infix',
       operator: '@',
       left: { kind: 'int_lit', value: 2 },
       right: { kind: 'int_lit', value: 3 },
-      line: 1,
-      column: 5,
-      literal: '@',
+      position: 10,
+      length: 5,
     } as ASTExpression);
     expect(isError(result)).toBe(true);
     expect(result).toMatchObject({ error: expectedError });
   });
   it('returns an error for division by zero on division', () => {
     const expectedError = Errors.runtimeDivisionByZero({
-      literal: '/',
-      line: 1,
-      column: 5,
+      position: 10,
+      length: 5,
     });
+
     const result = evaluate({
       kind: 'infix',
       operator: '/',
       left: { kind: 'int_lit', value: 2 },
       right: { kind: 'int_lit', value: 0 },
-      line: 1,
-      column: 5,
-      literal: '/',
+      position: 10,
+      length: 5,
     } as ASTExpression);
     expect(isError(result)).toBe(true);
     expect(result).toMatchObject({ error: expectedError });
   });
   it('returns an error for division by zero on modulo', () => {
     const expectedError = Errors.runtimeDivisionByZero({
-      literal: '%',
-      line: 1,
-      column: 5,
+      position: 10,
+      length: 5,
     });
     const result = evaluate({
       kind: 'infix',
       operator: '%',
       left: { kind: 'int_lit', value: 2 },
       right: { kind: 'int_lit', value: 0 },
-      line: 1,
-      column: 5,
-      literal: '%',
+      position: 10,
+      length: 5,
     } as ASTExpression);
     expect(isError(result)).toBe(true);
     expect(result).toMatchObject({ error: expectedError });

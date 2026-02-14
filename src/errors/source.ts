@@ -1,5 +1,4 @@
 export type TokenSource = {
-  line: number;
-  column: number;
-  literal: string;
+  position: number;
+  length: number;
 };

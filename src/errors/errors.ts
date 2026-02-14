@@ -2,30 +2,29 @@ import { TokenSource } from './source.js';
 
 export type VError = {
   message: string;
-};
-
-const createPosition = (source: TokenSource) =>
-  `[l: ${source.line}, c: ${source.column}]`;
+} & TokenSource;
 
 const unexpectedToken = (source: TokenSource): VError => ({
-  message: `Unexpected token '${source.literal}' ${createPosition(source)}`,
+  message: 'Unexpected token',
+  ...source,
 });
 
-const unexpectedEOF = (): VError => ({
-  message: `Unexpected end of file`,
+const unexpectedEOF = (source: TokenSource): VError => ({
+  message: 'Unexpected end of file',
+  ...source,
 });
 
 const expectedTokenNotFound = (
   source: TokenSource,
   expected: string
 ): VError => ({
-  message: `Expected '${expected}' but found '${source.literal}' ${createPosition(
-    source
-  )}`,
+  message: `Expected '${expected}' not found`,
+  ...source,
 });
 
 const runtimeDivisionByZero = (source: TokenSource): VError => ({
-  message: `Division by zero ${createPosition(source)}`,
+  message: 'Division by zero',
+  ...source,
 });
 
 export const Errors = {

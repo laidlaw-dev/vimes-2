@@ -6,8 +6,8 @@ describe('TokenStream', () => {
   describe('peek', () => {
     it('returns the current token without advancing the position', () => {
       const tokens = [
-        { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'int_lit', value: '42', position: 0, length: 2 },
+        { kind: 'plus', position: 3, length: 1 },
       ] as Token[];
       const stream = new TokenStream(tokens, 0);
 
@@ -18,24 +18,28 @@ describe('TokenStream', () => {
       const stream = new TokenStream([], 0);
       expect(stream.peek()).toMatchObject({
         kind: 'eof',
+        position: 0,
+        length: 0,
       });
     });
     it('returns the EOF token when the position is at the end of the stream', () => {
       const tokens = [
-        { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'int_lit', value: '42', position: 0, length: 2 },
+        { kind: 'plus', position: 3, length: 1 },
       ] as Token[];
       const stream = new TokenStream(tokens, tokens.length);
       expect(stream.peek()).toMatchObject({
         kind: 'eof',
+        position: 3 + 1,
+        length: 0,
       });
     });
   });
   describe('next', () => {
     it('returns the current token and advances the position', () => {
       const tokens = [
-        { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'int_lit', value: '42', position: 0, length: 2 },
+        { kind: 'plus', position: 3, length: 1 },
       ] as Token[];
       const stream = new TokenStream(tokens, 0);
       expect(stream.next()).toEqual(tokens[0]);
@@ -43,8 +47,8 @@ describe('TokenStream', () => {
     });
     it('returns eof when next is called past the end of the stream', () => {
       const tokens = [
-        { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'int_lit', value: '42', position: 0, length: 2 },
+        { kind: 'plus', position: 3, length: 1 },
       ] as Token[];
       const stream = new TokenStream(tokens, 0);
       stream.next();
@@ -57,8 +61,8 @@ describe('TokenStream', () => {
   describe('expect', () => {
     it('returns the current token and advances the position if it matches the expected kind', () => {
       const tokens = [
-        { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'int_lit', value: '42', position: 0, length: 2 },
+        { kind: 'plus', position: 3, length: 1 },
       ] as Token[];
       const stream = new TokenStream(tokens, 0);
       expect(stream.expect('int_lit')).toEqual(tokens[0]);
@@ -66,11 +70,12 @@ describe('TokenStream', () => {
     });
     it('returns an error if the current token does not match the expected kind', () => {
       const tokens = [
-        { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'plus', position: 0, length: 1 },
+        { kind: 'int_lit', value: '42', position: 1, length: 2 },
       ] as Token[];
+
       const expectedError = Errors.expectedTokenNotFound(
-        { literal: '42', line: 1, column: 1 },
+        { position: 0, length: 1 },
         '-'
       );
       const stream = new TokenStream(tokens, 0);
@@ -81,10 +86,10 @@ describe('TokenStream', () => {
     });
     it('returns an error if the current token is eof and does not match the expected kind', () => {
       const tokens = [
-        { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
-        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'int_lit', value: '42', position: 0, length: 2 },
+        { kind: 'plus', position: 3, length: 1 },
       ] as Token[];
-      const expectedError = Errors.unexpectedEOF();
+      const expectedError = Errors.unexpectedEOF({ position: 4, length: 0 });
       const stream = new TokenStream(tokens, tokens.length);
       const result = stream.expect('minus');
       expect(isError(result)).toBe(true);

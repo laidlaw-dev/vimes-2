@@ -8,14 +8,16 @@ export class TokenStream {
   ) {}
 
   peek(): Token {
-    return (
-      this.tokens[this.position] ?? {
-        kind: 'eof',
-        literal: '',
-        line: -1,
-        column: -1,
-      }
-    );
+    const token = this.tokens[this.position];
+    if (token) {
+      return token;
+    }
+    const lastToken = this.tokens[this.tokens.length - 1];
+    return {
+      kind: 'eof',
+      position: lastToken ? lastToken.position + lastToken.length : 0,
+      length: 0,
+    };
   }
 
   next(): Token {
@@ -30,7 +32,7 @@ export class TokenStream {
       if (token.kind !== 'eof') {
         return error(Errors.expectedTokenNotFound(token, tokenLiterals[kind]));
       }
-      return error(Errors.unexpectedEOF());
+      return error(Errors.unexpectedEOF(token));
     }
     return ok(token);
   }

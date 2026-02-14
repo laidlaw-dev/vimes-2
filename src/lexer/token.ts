@@ -8,11 +8,10 @@ export type TokenKind =
   | { kind: 'slash' }
   | { kind: 'percent' }
   | { kind: 'left_paren' }
-  | { kind: 'right_paren' };
+  | { kind: 'right_paren' }
+  | { kind: 'eof' };
 
-export type PositionalToken = TokenKind & TokenSource;
-
-export type Token = PositionalToken | { kind: 'eof' };
+export type Token = TokenKind & TokenSource;
 
 export const tokenLiterals = {
   int_lit: '[int]',

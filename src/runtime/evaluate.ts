@@ -13,9 +13,8 @@ export const evaluate = (expr: ASTExpression): Result<number> => {
         default:
           return error(
             Errors.unexpectedToken({
-              literal: expr.operator,
-              line: expr.line,
-              column: expr.column,
+              position: expr.position,
+              length: expr.length,
             })
           );
       }
@@ -51,9 +50,8 @@ export const evaluate = (expr: ASTExpression): Result<number> => {
         default:
           return error(
             Errors.unexpectedToken({
-              literal: expr.operator,
-              line: expr.line,
-              column: expr.column,
+              position: expr.position,
+              length: expr.length,
             })
           );
       }
