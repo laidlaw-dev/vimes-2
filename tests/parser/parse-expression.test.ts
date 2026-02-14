@@ -1,3 +1,4 @@
+import { Errors, isError } from '@/errors/index.js';
 import { TokenStream, Token } from '../../src/lexer/index.js';
 import { parseExpression } from '../../src/parser/parse-expression.js';
 
@@ -155,13 +156,83 @@ describe('parseExpression', () => {
       right: { kind: 'int_lit', value: 3 },
     });
   });
-  it('throws an error on unexpected tokens', () => {
+  it('add position information to the AST nodes', () => {
     const stream = new TokenStream(
-      [{ kind: 'plus', literal: '+', line: 1, column: 1 }] as Token[],
+      [
+        { kind: 'int_lit', literal: '5', value: 5, line: 1, column: 1 },
+        { kind: 'plus', literal: '+', line: 1, column: 3 },
+        { kind: 'int_lit', literal: '3', value: 3, line: 2, column: 5 },
+      ],
       0
     );
-    expect(() => parseExpression(stream)).toThrow(
-      `Unexpected token "+" at line 1, col 1`
+    const result = parseExpression(stream);
+    expect(result).toMatchObject({
+      kind: 'infix',
+      operator: '+',
+      left: { kind: 'int_lit', value: 5, literal: '5', line: 1, column: 1 },
+      right: { kind: 'int_lit', value: 3, literal: '3', line: 2, column: 5 },
+      line: 1,
+      column: 3,
+    });
+  });
+  it('returns an error on unexpected tokens in prefix', () => {
+    const stream = new TokenStream(
+      [{ kind: 'plus', literal: '+', line: 1, column: 1 }],
+      0
     );
+    const expectedError = Errors.unexpectedToken({
+      literal: '+',
+      line: 1,
+      column: 1,
+    });
+    const result = parseExpression(stream);
+    expect(isError(result)).toBe(true);
+    expect(result).toMatchObject({ error: expectedError });
+  });
+  it('returns an error on unexpected tokens in infix', () => {
+    const stream = new TokenStream(
+      [
+        { kind: 'int_lit', value: 5, literal: '5', line: 1, column: 1 },
+        { kind: 'plus', literal: '+', line: 1, column: 3 },
+        { kind: 'percent', literal: '%', line: 1, column: 5 },
+      ],
+      0
+    );
+    const expectedError = Errors.unexpectedToken({
+      literal: '%',
+      line: 1,
+      column: 5,
+    });
+    const result = parseExpression(stream);
+    expect(isError(result)).toBe(true);
+    expect(result).toMatchObject({ error: expectedError });
+  });
+  it('returns an error on unexpected eof in infix', () => {
+    const stream = new TokenStream(
+      [
+        { kind: 'int_lit', value: 5, literal: '5', line: 1, column: 1 },
+        { kind: 'plus', literal: '+', line: 1, column: 3 },
+      ],
+      0
+    );
+    const expectedError = Errors.unexpectedEOF();
+    const result = parseExpression(stream);
+    expect(isError(result)).toBe(true);
+    expect(result).toMatchObject({ error: expectedError });
+  });
+  it('returns an error on when right parenthesis is missing', () => {
+    const stream = new TokenStream(
+      [
+        { kind: 'left_paren', literal: '(', line: 1, column: 1 },
+        { kind: 'int_lit', value: 5, literal: '5', line: 1, column: 2 },
+        { kind: 'plus', literal: '+', line: 1, column: 4 },
+        { kind: 'int_lit', value: 3, literal: '3', line: 1, column: 6 },
+      ],
+      0
+    );
+    const expectedError = Errors.unexpectedEOF();
+    const result = parseExpression(stream);
+    expect(isError(result)).toBe(true);
+    expect(result).toMatchObject({ error: expectedError });
   });
 });

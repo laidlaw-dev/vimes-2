@@ -1,3 +1,5 @@
+import { Errors } from '@/errors/errors.js';
+import { isError } from '@/errors/index.js';
 import { Token, TokenStream } from '@/lexer/index.js';
 
 describe('TokenStream', () => {
@@ -62,25 +64,31 @@ describe('TokenStream', () => {
       expect(stream.expect('int_lit')).toEqual(tokens[0]);
       expect(stream.expect('plus')).toEqual(tokens[1]);
     });
-    it('throws an error if the current token does not match the expected kind', () => {
+    it('returns an error if the current token does not match the expected kind', () => {
       const tokens = [
         { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
         { kind: 'plus', literal: '+', line: 1, column: 4 },
       ] as Token[];
+      const expectedError = Errors.expectedTokenNotFound(
+        { literal: '42', line: 1, column: 1 },
+        'minus'
+      );
       const stream = new TokenStream(tokens, 0);
-      expect(() => stream.expect('minus')).toThrow(
-        'Expected token of kind "minus" but found "42" at line 1, col 1'
-      );
+
+      const result = stream.expect('minus');
+      expect(isError(result)).toBe(true);
+      expect(result).toMatchObject({ error: expectedError });
     });
-    it('throws an error if the current token is eof and does not match the expected kind', () => {
+    it('returns an error if the current token is eof and does not match the expected kind', () => {
       const tokens = [
         { kind: 'int_lit', value: '42', literal: '42', line: 1, column: 1 },
         { kind: 'plus', literal: '+', line: 1, column: 4 },
       ] as Token[];
+      const expectedError = Errors.unexpectedEOF();
       const stream = new TokenStream(tokens, tokens.length);
-      expect(() => stream.expect('minus')).toThrow(
-        'Expected token of kind "minus" but found end of file'
-      );
+      const result = stream.expect('minus');
+      expect(isError(result)).toBe(true);
+      expect(result).toMatchObject({ error: expectedError });
     });
   });
 });

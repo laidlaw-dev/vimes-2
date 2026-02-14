@@ -11,6 +11,21 @@ const unexpectedToken = (source: TokenSource): VError => ({
   message: `Unexpected token '${source.literal}' ${createPosition(source)}`,
 });
 
+const unexpectedEOF = (): VError => ({
+  message: `Unexpected end of file`,
+});
+
+const expectedTokenNotFound = (
+  source: TokenSource,
+  expected: string
+): VError => ({
+  message: `Expected '${expected}' but found '${source.literal}' ${createPosition(
+    source
+  )}`,
+});
+
 export const Errors = {
   unexpectedToken,
+  unexpectedEOF,
+  expectedTokenNotFound,
 };

@@ -13,3 +13,15 @@ export type TokenKind =
 export type PositionalToken = TokenKind & TokenSource;
 
 export type Token = PositionalToken | { kind: 'eof' };
+
+export const tokenLiterals = {
+  int_lit: '[int]',
+  plus: '+',
+  minus: '-',
+  star: '*',
+  slash: '/',
+  percent: '%',
+  left_paren: '(',
+  right_paren: ')',
+  eof: 'EOF',
+};

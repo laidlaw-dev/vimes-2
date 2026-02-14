@@ -1,4 +1,5 @@
-import { Token } from './token.js';
+import { ok, error, Errors, Result } from '@/errors/index.js';
+import { Token, tokenLiterals } from './token.js';
 
 export class TokenStream {
   constructor(
@@ -23,16 +24,14 @@ export class TokenStream {
     return token;
   }
 
-  expect(kind: Token['kind']): Token {
+  expect(kind: Token['kind']): Result<Token> {
     const token = this.next();
     if (token.kind !== kind) {
       if (token.kind !== 'eof') {
-        throw new Error(
-          `Expected token of kind "${kind}" but found "${token.literal}" at line ${token.line}, col ${token.column}`
-        );
+        return error(Errors.expectedTokenNotFound(token, tokenLiterals[kind]));
       }
-      throw new Error(`Expected token of kind "${kind}" but found end of file`);
+      return error(Errors.unexpectedEOF());
     }
-    return token;
+    return ok(token);
   }
 }

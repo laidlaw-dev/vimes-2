@@ -9,6 +9,9 @@ export function replStep(input: string): string {
     return `Error: ${tokens.error.message}`;
   }
   const ast = parseExpression(new TokenStream(tokens, 0));
+  if (isError(ast)) {
+    return `Error: ${ast.error.message}`;
+  }
   const result = evaluate(ast);
   return result.toString();
 }

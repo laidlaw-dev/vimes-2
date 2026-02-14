@@ -1,4 +1,6 @@
-export type ASTExpression =
+import { TokenSource } from '@/errors/source.js';
+
+export type ASTExpressionCore =
   | { kind: 'int_lit'; value: number }
   | { kind: 'prefix'; operator: string; right: ASTExpression }
   | {
@@ -7,3 +9,5 @@ export type ASTExpression =
       left: ASTExpression;
       right: ASTExpression;
     };
+
+export type ASTExpression = ASTExpressionCore & TokenSource;
