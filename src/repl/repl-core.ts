@@ -13,5 +13,8 @@ export function replStep(input: string): string {
     return `Error: ${ast.error.message}`;
   }
   const result = evaluate(ast);
+  if (isError(result)) {
+    return `Error: ${result.error.message}`;
+  }
   return result.toString();
 }

@@ -17,4 +17,12 @@ describe('replStep', () => {
     const expectedError = Errors.unexpectedEOF();
     expect(replStep('1 +')).toBe(`Error: ${expectedError.message}`);
   });
+  it('returns an error message for runtime errors', () => {
+    const expectedError = Errors.runtimeDivisionByZero({
+      literal: '0',
+      line: 1,
+      column: 3,
+    });
+    expect(replStep('1 / 0')).toBe(`Error: ${expectedError.message}`);
+  });
 });

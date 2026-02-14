@@ -71,7 +71,7 @@ describe('TokenStream', () => {
       ] as Token[];
       const expectedError = Errors.expectedTokenNotFound(
         { literal: '42', line: 1, column: 1 },
-        'minus'
+        '-'
       );
       const stream = new TokenStream(tokens, 0);
 

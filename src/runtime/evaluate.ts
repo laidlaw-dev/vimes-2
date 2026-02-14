@@ -1,6 +1,7 @@
+import { error, Errors, isError, Result } from '@/errors/index.js';
 import { ASTExpression } from '../parser/ast-expression.js';
 
-export const evaluate = (expr: ASTExpression): number => {
+export const evaluate = (expr: ASTExpression): Result<number> => {
   switch (expr.kind) {
     case 'int_lit':
       return expr.value;
@@ -10,12 +11,24 @@ export const evaluate = (expr: ASTExpression): number => {
         case '-':
           return -right;
         default:
-          throw new Error(`Unknown prefix operator: ${expr.operator}`);
+          return error(
+            Errors.unexpectedToken({
+              literal: expr.operator,
+              line: expr.line,
+              column: expr.column,
+            })
+          );
       }
     }
     case 'infix': {
       const left = evaluate(expr.left);
+      if (isError(left)) {
+        return left;
+      }
       const right = evaluate(expr.right);
+      if (isError(right)) {
+        return right;
+      }
       switch (expr.operator) {
         case '+':
           return left + right;
@@ -23,12 +36,26 @@ export const evaluate = (expr: ASTExpression): number => {
           return left - right;
         case '*':
           return left * right;
-        case '/':
+        case '/': {
+          if (right === 0) {
+            return error(Errors.runtimeDivisionByZero(expr));
+          }
           return left / right;
-        case '%':
+        }
+        case '%': {
+          if (right === 0) {
+            return error(Errors.runtimeDivisionByZero(expr));
+          }
           return left % right;
+        }
         default:
-          throw new Error(`Unknown infix operator: ${expr.operator}`);
+          return error(
+            Errors.unexpectedToken({
+              literal: expr.operator,
+              line: expr.line,
+              column: expr.column,
+            })
+          );
       }
     }
   }

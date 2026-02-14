@@ -24,8 +24,13 @@ const expectedTokenNotFound = (
   )}`,
 });
 
+const runtimeDivisionByZero = (source: TokenSource): VError => ({
+  message: `Division by zero ${createPosition(source)}`,
+});
+
 export const Errors = {
   unexpectedToken,
   unexpectedEOF,
   expectedTokenNotFound,
+  runtimeDivisionByZero,
 };
