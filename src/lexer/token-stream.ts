@@ -1,4 +1,5 @@
-import { Token } from './token.js';
+import { ok, error, Errors, Result } from '@/errors/index.js';
+import { Token, tokenLiterals } from './token.js';
 
 export class TokenStream {
   constructor(
@@ -7,14 +8,16 @@ export class TokenStream {
   ) {}
 
   peek(): Token {
-    return (
-      this.tokens[this.position] ?? {
-        kind: 'eof',
-        literal: '',
-        line: -1,
-        column: -1,
-      }
-    );
+    const token = this.tokens[this.position];
+    if (token) {
+      return token;
+    }
+    const lastToken = this.tokens[this.tokens.length - 1];
+    return {
+      kind: 'eof',
+      position: lastToken ? lastToken.position + lastToken.length : 0,
+      length: 0,
+    };
   }
 
   next(): Token {
@@ -23,16 +26,14 @@ export class TokenStream {
     return token;
   }
 
-  expect(kind: Token['kind']): Token {
+  expect(kind: Token['kind']): Result<Token> {
     const token = this.next();
     if (token.kind !== kind) {
       if (token.kind !== 'eof') {
-        throw new Error(
-          `Expected token of kind "${kind}" but found "${token.literal}" at line ${token.line}, col ${token.column}`
-        );
+        return error(Errors.expectedTokenNotFound(token, tokenLiterals[kind]));
       }
-      throw new Error(`Expected token of kind "${kind}" but found end of file`);
+      return error(Errors.unexpectedEOF(token));
     }
-    return token;
+    return ok(token);
   }
 }

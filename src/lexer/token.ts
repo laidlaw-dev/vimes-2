@@ -1,8 +1,4 @@
-export type TokenSource = {
-  line: number;
-  column: number;
-  literal: string;
-};
+import { TokenSource } from '@/errors/index.js';
 
 export type TokenKind =
   | { kind: 'int_lit'; value: number }
@@ -12,8 +8,19 @@ export type TokenKind =
   | { kind: 'slash' }
   | { kind: 'percent' }
   | { kind: 'left_paren' }
-  | { kind: 'right_paren' };
+  | { kind: 'right_paren' }
+  | { kind: 'eof' };
 
-export type PositionalToken = TokenKind & TokenSource;
+export type Token = TokenKind & TokenSource;
 
-export type Token = PositionalToken | { kind: 'eof' };
+export const tokenLiterals = {
+  int_lit: '[int]',
+  plus: '+',
+  minus: '-',
+  star: '*',
+  slash: '/',
+  percent: '%',
+  left_paren: '(',
+  right_paren: ')',
+  eof: 'EOF',
+};
