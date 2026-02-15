@@ -1,12 +1,14 @@
-import { styleText } from 'node:util';
-
 export const errorContext = (
   source: string,
   position: number,
   length: number
 ) => {
   if (source.trim() === '') {
-    return '';
+    return {
+      left: '',
+      target: '',
+      right: '',
+    };
   }
   const highlightStart = Math.max(0, Math.min(position, source.length));
   const highlightEnd = Math.min(source.length, Math.max(position + length, 0));
@@ -14,12 +16,11 @@ export const errorContext = (
   const leftContext = getLeftContext(source, highlightStart);
   const rightContext = getRightContext(source, highlightEnd);
 
-  return (
-    styleText('dim', leftContext) +
-    styleText('bold', source.slice(highlightStart, highlightEnd)) +
-    styleText('dim', rightContext) +
-    styleText('reset', '')
-  ).trim();
+  return {
+    left: leftContext.trimStart(),
+    target: source.slice(highlightStart, highlightEnd),
+    right: rightContext.trimEnd(),
+  };
 };
 
 const getLeftContext = (source: string, start: number) => {
