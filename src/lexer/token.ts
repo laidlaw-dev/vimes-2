@@ -2,6 +2,7 @@ import { TokenSource } from '@/errors/index.js';
 
 export type TokenKind =
   | { kind: 'int_lit'; value: number }
+  | { kind: 'number_lit'; value: number }
   | { kind: 'plus' }
   | { kind: 'minus' }
   | { kind: 'star' }
@@ -15,6 +16,7 @@ export type Token = TokenKind & TokenSource;
 
 export const tokenLiterals = {
   int_lit: '[int]',
+  number_lit: '[number]',
   plus: '+',
   minus: '-',
   star: '*',

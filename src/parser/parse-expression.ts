@@ -30,6 +30,11 @@ const nud = (token: Token, stream: TokenStream): Result<ASTExpression> => {
         kind: 'int_lit',
         value: token.value as number,
       });
+    case 'number_lit':
+      return createNodeWithPosition(token, {
+        kind: 'number_lit',
+        value: token.value as number,
+      });
     case 'minus': {
       const right = parseExpression(stream, 100);
       if (isError(right)) {

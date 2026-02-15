@@ -75,16 +75,24 @@ class Tokenizer {
   }
 
   private readNumber(): Token | undefined {
-    if (!this.isDigit(this.input[this.position])) {
+    if (!this.isNumberStart(this.input[this.position])) {
       return undefined;
     }
     let lexeme = '';
     const startPosition = this.position;
     let current = startPosition;
 
-    while (!this.isEndOfInput() && this.isDigit(this.input[current])) {
+    while (!this.isEndOfInput() && this.isNumber(this.input[current])) {
       lexeme += this.input[current];
       current++;
+    }
+
+    if (lexeme.includes('.') || lexeme.includes('e') || lexeme.includes('E')) {
+      return {
+        kind: 'number_lit',
+        value: parseFloat(lexeme),
+        ...this.getTokenSource(startPosition, lexeme),
+      };
     }
 
     return {
@@ -171,5 +179,11 @@ class Tokenizer {
   }
   private isDigit(char: string) {
     return char >= '0' && char <= '9';
+  }
+  private isNumberStart(char: string) {
+    return this.isDigit(char) || char === '.';
+  }
+  private isNumber(char: string) {
+    return this.isDigit(char) || char === '.' || char === 'e' || char === 'E';
   }
 }

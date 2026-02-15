@@ -11,6 +11,14 @@ describe('parseExpression', () => {
     const result = parseExpression(stream);
     expect(result).toMatchObject({ kind: 'int_lit', value: 42 });
   });
+  it('parses number literals', () => {
+    const stream = new TokenStream(
+      [{ kind: 'number_lit', value: 42.5 }] as Token[],
+      0
+    );
+    const result = parseExpression(stream);
+    expect(result).toMatchObject({ kind: 'number_lit', value: 42.5 });
+  });
   it('parses prefix expressions', () => {
     const stream = new TokenStream(
       [{ kind: 'minus' }, { kind: 'int_lit', value: 5 }] as Token[],

@@ -6,6 +6,7 @@ import { isError } from '@/errors/result.js';
 import { TokenSource, VError } from '@/errors/index.js';
 import { errorContext } from './error-context.js';
 import { errorPosition } from './error-position.js';
+import { typeCheckExpression } from '@/type-checker/index.js';
 
 export function replStep(input: string): string {
   const tokens = tokenize(input);
@@ -15,6 +16,10 @@ export function replStep(input: string): string {
   const ast = parseExpression(new TokenStream(tokens, 0));
   if (isError(ast)) {
     return getErrorMessage(input, ast.error);
+  }
+  const typeChecked = typeCheckExpression(ast);
+  if (isError(typeChecked)) {
+    return getErrorMessage(input, typeChecked.error);
   }
   const result = evaluate(ast);
   if (isError(result)) {

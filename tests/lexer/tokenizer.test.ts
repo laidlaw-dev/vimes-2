@@ -16,6 +16,34 @@ describe('tokenize', () => {
       ]);
     });
   });
+  describe('numbers', () => {
+    it('tokenizes a single number literal', () => {
+      expect(tokenize('123.45')).toMatchObject([
+        { kind: 'number_lit', value: 123.45, position: 0, length: 6 },
+      ]);
+    });
+    it('tokenizes a number literal with no leading digits', () => {
+      expect(tokenize('.45')).toMatchObject([
+        { kind: 'number_lit', value: 0.45, position: 0, length: 3 },
+      ]);
+    });
+    it('tokenizes a number literal with no trailing digits', () => {
+      expect(tokenize('123.')).toMatchObject([
+        { kind: 'number_lit', value: 123, position: 0, length: 4 },
+      ]);
+    });
+    it('tokenizes a number in exponential notation', () => {
+      expect(tokenize('1.23e4')).toMatchObject([
+        { kind: 'number_lit', value: 12300, position: 0, length: 6 },
+      ]);
+    });
+    it('tokenizes negative number literals as 2 tokens', () => {
+      expect(tokenize('-123.45')).toMatchObject([
+        { kind: 'minus', position: 0, length: 1 },
+        { kind: 'number_lit', value: 123.45, position: 1, length: 6 },
+      ]);
+    });
+  });
   describe('operators', () => {
     it('tokenizes a plus operator', () => {
       expect(tokenize('+')).toMatchObject([

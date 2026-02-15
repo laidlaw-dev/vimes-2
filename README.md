@@ -24,8 +24,10 @@ src/
   parser/
   runtime/
   repl/
+  type-checker/
 tests/
   lexer/
   parser/
   runtime/
   repl/
+  type-checker/

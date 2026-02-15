@@ -16,6 +16,14 @@ describe('replStep', () => {
     const expectedError = Errors.unexpectedEOF({ position: 3, length: 0 });
     expect(replStep('1 +')).toContain(`Error: ${expectedError.message}`);
   });
+  it('returns an error message for type errors', () => {
+    const expectedError = Errors.binaryTypeError(
+      { position: 0, length: 0 },
+      'int',
+      'number'
+    );
+    expect(replStep('1 + 2.5')).toContain(`Error: ${expectedError.message}`);
+  });
   it('returns an error message for runtime errors', () => {
     const expectedError = Errors.runtimeDivisionByZero({
       position: 4,
